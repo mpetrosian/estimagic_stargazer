@@ -20,7 +20,7 @@
 *.nav
 *.o
 *.out
-*.pdf
+
 *.pdfsync
 *.prj
 *.pyc
