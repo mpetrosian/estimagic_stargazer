@@ -1,0 +1,557 @@
+
+\documentclass[12pt]{article}
+\usepackage[toc,page]{appendix}
+\usepackage[utf8]{inputenc}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{amsmath}
+%usepackage{soul}
+%usepackage{bookmark}
+\usepackage[left=3cm, right=2cm, bottom=2cm, top=2cm]{geometry}
+%\usepackage{hyperref}
+%\usepackage{natbib}
+\usepackage[onehalfspacing]{setspace}
+\usepackage{listings}
+\usepackage{tabularx}
+\usepackage{biblatex}
+%\usepackage[english]{babel}
+\renewcommand{\figurename}{\textbf{Fig.}}
+\usepackage[bf]{caption}
+%\usepackage{graphicx} %remove demo for real images! 
+\definecolor{mariam:p}{RGB}{0,130,90}
+\definecolor{sonja}{cmyk}{0.9,0,0.3,0}
+\usepackage{amssymb}
+\usepackage[T1]{fontenc}
+
+\usepackage{scalerel,stackengine}
+\numberwithin{equation}{subsection}
+\stackMath
+\newcommand\reallywidehat[1]{%
+\savestack{\tmpbox}{\stretchto{%
+  \scaleto{%
+    \scalerel*[\widthof{\ensuremath{#1}}]{\kern-.6pt\bigwedge\kern-.6pt}%
+    {\rule[-\textheight/2]{1ex}{\textheight}}%WIDTH-LIMITED BIG WEDGE
+  }{\textheight}% 
+}{0.5ex}}%
+\stackon[1pt]{#1}{\tmpbox}%
+}
+\begin{document}
+
+\begin{table}[!htbp] \centering
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lcc}
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+& \multicolumn{2}{c}{\textit{Dependent variable:}} \
+\cr \cline{2-3}
+\\[-1.8ex] & (1) & (2) \\
+\hline \\[-1.8ex]
+ ABP & 416.674$^{***}$ & 397.583$^{***}$ \\
+  & (69.495) & (70.87) \\
+  & & \\
+ Age & 37.241$^{}$ & 24.704$^{}$ \\
+  & (64.117) & (65.411) \\
+  & & \\
+ BMI & 787.179$^{***}$ & 789.742$^{***}$ \\
+  & (65.424) & (66.887) \\
+  & & \\
+ S1 & & 197.852$^{}$ \\
+  & & (143.812) \\
+  & & \\
+ S2 & & -169.251$^{}$ \\
+  & & (142.744) \\
+  & & \\
+ Sex & -106.578$^{*}$ & -82.862$^{}$ \\
+  & (62.125) & (64.851) \\
+  & & \\
+ const & 152.133$^{***}$ & 152.133$^{***}$ \\
+  & (2.853) & (2.853) \\
+  & & \\
+\hline \\[-1.8ex]
+ Observations & 442.0 & 442.0 \\
+ R${2}$ & 0.4 & 0.403 \\
+ Adjusted R${2}$ & 0.395 & 0.395 \\
+ Residual Std. Error & 59.976(df = 437.0) & 59.982(df = 435.0)  \\
+ F Statistic & 72.913$^{***}$ (df = 4.0; 437.0) & 48.915$^{***}$ (df = 6.0; 435.0) \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:} & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp] \centering
+  \caption{Diabetes Study}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lcc}
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+& \multicolumn{2}{c}{\textit{Dependent variable:}} \
+\cr \cline{2-3}
+\\[-1.8ex] & (1) & (2) \\
+\hline \\[-1.8ex]
+ ABP & 416.674$^{***}$ & 397.583$^{***}$ \\
+  & (69.495) & (70.87) \\
+  & & \\
+ Age & 37.241$^{}$ & 24.704$^{}$ \\
+  & (64.117) & (65.411) \\
+  & & \\
+ BMI & 787.179$^{***}$ & 789.742$^{***}$ \\
+  & (65.424) & (66.887) \\
+  & & \\
+ S1 & & 197.852$^{}$ \\
+  & & (143.812) \\
+  & & \\
+ S2 & & -169.251$^{}$ \\
+  & & (142.744) \\
+  & & \\
+ Sex & -106.578$^{*}$ & -82.862$^{}$ \\
+  & (62.125) & (64.851) \\
+  & & \\
+ const & 152.133$^{***}$ & 152.133$^{***}$ \\
+  & (2.853) & (2.853) \\
+  & & \\
+\hline \\[-1.8ex]
+ Observations & 442.0 & 442.0 \\
+ R${2}$ & 0.4 & 0.403 \\
+ Adjusted R${2}$ & 0.395 & 0.395 \\
+ Residual Std. Error & 59.976(df = 437.0) & 59.982(df = 435.0)  \\
+ F Statistic & 72.913$^{***}$ (df = 4.0; 437.0) & 48.915$^{***}$ (df = 6.0; 435.0) \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:} & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp] \centering
+  \caption{Diabetes Study}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lcc}
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+& \multicolumn{2}{c}{\textit{Dependent variable:}} \
+\cr \cline{2-3}
+\\[-1.8ex] & (1) & (2) \\
+\hline \\[-1.8ex]
+ ABP & 416.674$^{***}$ & 397.583$^{***}$ \\
+  & (69.495) & (70.87) \\
+  & & \\
+ Age & 37.241$^{}$ & 24.704$^{}$ \\
+  & (64.117) & (65.411) \\
+  & & \\
+ BMI & 787.179$^{***}$ & 789.742$^{***}$ \\
+  & (65.424) & (66.887) \\
+  & & \\
+ S1 & & 197.852$^{}$ \\
+  & & (143.812) \\
+  & & \\
+ S2 & & -169.251$^{}$ \\
+  & & (142.744) \\
+  & & \\
+ Sex & -106.578$^{*}$ & -82.862$^{}$ \\
+  & (62.125) & (64.851) \\
+  & & \\
+ const & 152.133$^{***}$ & 152.133$^{***}$ \\
+  & (2.853) & (2.853) \\
+  & & \\
+\hline \\[-1.8ex]
+ Observations & 442.0 & 442.0 \\
+ R${2}$ & 0.4 & 0.403 \\
+ Adjusted R${2}$ & 0.395 & 0.395 \\
+ Residual Std. Error & 59.976(df = 437.0) & 59.982(df = 435.0)  \\
+ F Statistic & 72.913$^{***}$ (df = 4.0; 437.0) & 48.915$^{***}$ (df = 6.0; 435.0) \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:} & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp] \centering
+  \caption{Diabetes Study}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lcc}
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+& \multicolumn{2}{c}{\textit{Dependent variable:}} \
+\cr \cline{2-3}
+\\[-1.8ex] & (1) & (2) \\
+\hline \\[-1.8ex]
+ ABP & 416.674$^{***}$ & 397.583$^{***}$ \\
+  & (69.495) & (70.87) \\
+  & & \\
+ Age & 37.241$^{}$ & 24.704$^{}$ \\
+  & (64.117) & (65.411) \\
+  & & \\
+ BMI & 787.179$^{***}$ & 789.742$^{***}$ \\
+  & (65.424) & (66.887) \\
+  & & \\
+ S1 & & 197.852$^{}$ \\
+  & & (143.812) \\
+  & & \\
+ S2 & & -169.251$^{}$ \\
+  & & (142.744) \\
+  & & \\
+ Sex & -106.578$^{*}$ & -82.862$^{}$ \\
+  & (62.125) & (64.851) \\
+  & & \\
+ const & 152.133$^{***}$ & 152.133$^{***}$ \\
+  & (2.853) & (2.853) \\
+  & & \\
+\hline \\[-1.8ex]
+ Observations & 442.0 & 442.0 \\
+ R${2}$ & 0.4 & 0.403 \\
+ Adjusted R${2}$ & 0.395 & 0.395 \\
+ Residual Std. Error & 59.976(df = 437.0) & 59.982(df = 435.0)  \\
+ F Statistic & 72.913$^{***}$ (df = 4.0; 437.0) & 48.915$^{***}$ (df = 6.0; 435.0) \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:} & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\
+\end{tabular}
+\end{table}
+ 
+
+\begin{table}[!htbp] \centering
+  \caption{Diabetes Study}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lcc}
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+& \multicolumn{2}{c}{\textit{Dependent variable:}} \
+\cr \cline{2-3}
+\\[-1.8ex] & (1) & (2) \\
+\hline \\[-1.8ex]
+ ABP & 416.674$^{***}$ & 397.583$^{***}$ \\
+  & (69.495) & (70.87) \\
+  & & \\
+ Age & 37.241$^{}$ & 24.704$^{}$ \\
+  & (64.117) & (65.411) \\
+  & & \\
+ BMI & 787.179$^{***}$ & 789.742$^{***}$ \\
+  & (65.424) & (66.887) \\
+  & & \\
+ S1 & & 197.852$^{}$ \\
+  & & (143.812) \\
+  & & \\
+ S2 & & -169.251$^{}$ \\
+  & & (142.744) \\
+  & & \\
+ Sex & -106.578$^{*}$ & -82.862$^{}$ \\
+  & (62.125) & (64.851) \\
+  & & \\
+ const & 152.133$^{***}$ & 152.133$^{***}$ \\
+  & (2.853) & (2.853) \\
+  & & \\
+\hline \\[-1.8ex]
+ Observations & 442.0 & 442.0 \\
+ R${2}$ & 0.4 & 0.403 \\
+ Adjusted R${2}$ & 0.395 & 0.395 \\
+ Residual Std. Error & 59.976(df = 437.0) & 59.982(df = 435.0)  \\
+ F Statistic & 72.913$^{***}$ (df = 4.0; 437.0) & 48.915$^{***}$ (df = 6.0; 435.0) \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:} & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\
+\end{tabular}
+\end{table}
+
+
+\begin{table}[!htbp] \centering
+  \caption{Diabetes Study}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lcc}
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+& \multicolumn{2}{c}{\textit{Dependent variable:}} \
+\cr \cline{2-3}
+\\[-1.8ex] & (1) & (2) \\
+\hline \\[-1.8ex]
+ ABP & 416.67$^{***}$ & 397.58$^{***}$ \\
+  & (69.49) & (70.87) \\
+  & & \\
+ Age & 37.24$^{}$ & 24.7$^{}$ \\
+  & (64.12) & (65.41) \\
+  & & \\
+ BMI & 787.18$^{***}$ & 789.74$^{***}$ \\
+  & (65.42) & (66.89) \\
+  & & \\
+ S1 & & 197.85$^{}$ \\
+  & & (143.81) \\
+  & & \\
+ S2 & & -169.25$^{}$ \\
+  & & (142.74) \\
+  & & \\
+ Sex & -106.58$^{*}$ & -82.86$^{}$ \\
+  & (62.13) & (64.85) \\
+  & & \\
+ const & 152.13$^{***}$ & 152.13$^{***}$ \\
+  & (2.85) & (2.85) \\
+  & & \\
+\hline \\[-1.8ex]
+ Observations & 442.0 & 442.0 \\
+ R${2}$ & 0.4 & 0.4 \\
+ Adjusted R${2}$ & 0.39 & 0.39 \\
+ Residual Std. Error & 59.98(df = 437.0) & 59.98(df = 435.0)  \\
+ F Statistic & 72.91$^{***}$ (df = 4.0; 437.0) & 48.91$^{***}$ (df = 6.0; 435.0) \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:} & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp] \centering
+  \caption{Diabetes Study}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lcc}
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+& \multicolumn{2}{c}{\textit{Dependent variable:}} \
+\cr \cline{2-3}
+\\[-1.8ex] & (1) & (2) \\
+\hline \\[-1.8ex]
+ ABP & 416.67$^{***}$ & 397.58$^{***}$ \\
+  & (280.09 , 553.26) & (258.29 , 536.87) \\
+  & & \\
+ Age & 37.24$^{}$ & 24.7$^{}$ \\
+  & (-88.78 , 163.26) & (-103.86 , 153.26) \\
+  & & \\
+ BMI & 787.18$^{***}$ & 789.74$^{***}$ \\
+  & (658.59 , 915.76) & (658.28 , 921.2) \\
+  & & \\
+ S1 & & 197.85$^{}$ \\
+  & & (-84.8 , 480.51) \\
+  & & \\
+ S2 & & -169.25$^{}$ \\
+  & & (-449.8 , 111.3) \\
+  & & \\
+ Sex & -106.58$^{*}$ & -82.86$^{}$ \\
+  & (-228.68 , 15.52) & (-210.32 , 44.6) \\
+  & & \\
+ const & 152.13$^{***}$ & 152.13$^{***}$ \\
+  & (146.53 , 157.74) & (146.53 , 157.74) \\
+  & & \\
+\hline \\[-1.8ex]
+ Observations & 442.0 & 442.0 \\
+ R${2}$ & 0.4 & 0.4 \\
+ Adjusted R${2}$ & 0.39 & 0.39 \\
+ Residual Std. Error & 59.98(df = 437.0) & 59.98(df = 435.0)  \\
+ F Statistic & 72.91$^{***}$ (df = 4.0; 437.0) & 48.91$^{***}$ (df = 6.0; 435.0) \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:} & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\
+\end{tabular}
+\end{table}
+
+
+\begin{table}[!htbp] \centering
+  \caption{Diabetes Study}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lcc}
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+& \multicolumn{2}{c}{\textit{Dependent variable:}} \
+\cr \cline{2-3}
+\\[-1.8ex] & (1) & (2) \\
+\hline \\[-1.8ex]
+ BMI & 787.18$^{***}$ & 789.74$^{***}$ \\
+  & (658.59 , 915.76) & (658.28 , 921.2) \\
+  & & \\
+ Age & 37.24$^{}$ & 24.7$^{}$ \\
+  & (-88.78 , 163.26) & (-103.86 , 153.26) \\
+  & & \\
+ S1 & & 197.85$^{}$ \\
+  & & (-84.8 , 480.51) \\
+  & & \\
+ Sex & -106.58$^{*}$ & -82.86$^{}$ \\
+  & (-228.68 , 15.52) & (-210.32 , 44.6) \\
+  & & \\
+\hline \\[-1.8ex]
+ Observations & 442.0 & 442.0 \\
+ R${2}$ & 0.4 & 0.4 \\
+ Adjusted R${2}$ & 0.39 & 0.39 \\
+ Residual Std. Error & 59.98(df = 437.0) & 59.98(df = 435.0)  \\
+ F Statistic & 72.91$^{***}$ (df = 4.0; 437.0) & 48.91$^{***}$ (df = 6.0; 435.0) \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:} & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\
+\end{tabular}
+\end{table}
+
+
+\begin{table}[!htbp] \centering
+  \caption{Diabetes Study}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lcc}
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+& \multicolumn{2}{c}{\textit{Dependent variable:}} \
+\cr \cline{2-3}
+\\[-1.8ex] & (1) & (2) \\
+\hline \\[-1.8ex]
+ BMI & 787.18$^{***}$ & 789.74$^{***}$ \\
+  & (658.59 , 915.76) & (658.28 , 921.2) \\
+  & & \\
+ Oldness & 37.24$^{}$ & 24.7$^{}$ \\
+  & (-88.78 , 163.26) & (-103.86 , 153.26) \\
+  & & \\
+ S1 & & 197.85$^{}$ \\
+  & & (-84.8 , 480.51) \\
+  & & \\
+ Sex & -106.58$^{*}$ & -82.86$^{}$ \\
+  & (-228.68 , 15.52) & (-210.32 , 44.6) \\
+  & & \\
+\hline \\[-1.8ex]
+ Observations & 442.0 & 442.0 \\
+ R${2}$ & 0.4 & 0.4 \\
+ Adjusted R${2}$ & 0.39 & 0.39 \\
+ Residual Std. Error & 59.98(df = 437.0) & 59.98(df = 435.0)  \\
+ F Statistic & 72.91$^{***}$ (df = 4.0; 437.0) & 48.91$^{***}$ (df = 6.0; 435.0) \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:} & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\
+\end{tabular}
+\end{table}
+
+
+\begin{table}[!htbp] \centering
+  \caption{Diabetes Study}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lcc}
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+& \multicolumn{2}{c}{\textit{Dependent variable:}} \
+\cr \cline{2-3}
+\\[-1.8ex] & (1) & (2) \\
+\hline \\[-1.8ex]
+ BMI & 787.18$^{***}$ & 789.74$^{***}$ \\
+  & (658.59 , 915.76) & (658.28 , 921.2) \\
+  & & \\
+ Oldness & 37.24$^{}$ & 24.7$^{}$ \\
+  & (-88.78 , 163.26) & (-103.86 , 153.26) \\
+  & & \\
+ S1 & & 197.85$^{}$ \\
+  & & (-84.8 , 480.51) \\
+  & & \\
+ Sex & -106.58$^{*}$ & -82.86$^{}$ \\
+  & (-228.68 , 15.52) & (-210.32 , 44.6) \\
+  & & \\
+\hline \\[-1.8ex]
+ Observations & 442.0 & 442.0 \\
+ R${2}$ & 0.4 & 0.4 \\
+ Adjusted R${2}$ & 0.39 & 0.39 \\
+ Residual Std. Error & 59.98 & 59.98  \\
+ F Statistic & 72.91$^{***}$  & 48.91$^{***}$  \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:} & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp] \centering
+  \caption{Diabetes Study}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lcc}
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+& \multicolumn{2}{c}{\textit{Dependent variable:}} \
+\cr \cline{2-3}
+\\[-1.8ex] & (1) & (2) \\
+\hline \\[-1.8ex]
+ BMI & 787.18$^{***}$ & 789.74$^{***}$ \\
+  & (658.59 , 915.76) & (658.28 , 921.2) \\
+  & & \\
+ Oldness & 37.24$^{}$ & 24.7$^{}$ \\
+  & (-88.78 , 163.26) & (-103.86 , 153.26) \\
+  & & \\
+ S1 & & 197.85$^{}$ \\
+  & & (-84.8 , 480.51) \\
+  & & \\
+ Sex & -106.58$^{*}$ & -82.86$^{}$ \\
+  & (-228.68 , 15.52) & (-210.32 , 44.6) \\
+  & & \\
+\hline \\[-1.8ex]
+ Observations & 442.0 & 442.0 \\
+ R${2}$ & 0.4 & 0.4 \\
+ Adjusted R${2}$ & 0.39 & 0.39 \\
+ Residual Std. Error & 59.98 & 59.98  \\
+ F Statistic & 72.91$^{***}$  & 48.91$^{***}$  \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:} & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\
+ & \multicolumn{2}{r}\textit{First note} \\
+ & \multicolumn{2}{r}\textit{Second note} \\
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp] \centering
+  \caption{Diabetes Study}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lcc}
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+& \multicolumn{2}{c}{\textit{Dependent variable:}} \
+\cr \cline{2-3}
+\\[-1.8ex] & (1) & (2) \\
+\hline \\[-1.8ex]
+ BMI & 787.18$^{***}$ & 789.74$^{***}$ \\
+  & (658.59 , 915.76) & (658.28 , 921.2) \\
+  & & \\
+ Oldness & 37.24$^{}$ & 24.7$^{}$ \\
+  & (-88.78 , 163.26) & (-103.86 , 153.26) \\
+  & & \\
+ S1 & & 197.85$^{}$ \\
+  & & (-84.8 , 480.51) \\
+  & & \\
+ Sex & -106.58$^{*}$ & -82.86$^{}$ \\
+  & (-228.68 , 15.52) & (-210.32 , 44.6) \\
+  & & \\
+\hline \\[-1.8ex]
+ Observations & 442.0 & 442.0 \\
+ R${2}$ & 0.4 & 0.4 \\
+ Adjusted R${2}$ & 0.39 & 0.39 \\
+ Residual Std. Error & 59.98 & 59.98  \\
+ F Statistic & 72.91$^{***}$  & 48.91$^{***}$  \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:} & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.07; $^{***}$p$<$0.05} \\
+ & \multicolumn{2}{r}\textit{First note} \\
+ & \multicolumn{2}{r}\textit{Second note} \\
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp] \centering
+  \caption{Diabetes Study}
+  \label{}
+\begin{tabular}{@{\extracolsep{5pt}}lcc}
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+& \multicolumn{2}{c}{\textit{Dependent variable:}} \
+\cr \cline{2-3}
+\\[-1.8ex] & (1) & (2) \\
+\hline \\[-1.8ex]
+ BMI & 787.18$^{***}$ & 789.74$^{***}$ \\
+  & (658.59 , 915.76) & (658.28 , 921.2) \\
+  & & \\
+ Oldness & 37.24$^{}$ & 24.7$^{}$ \\
+  & (-88.78 , 163.26) & (-103.86 , 153.26) \\
+  & & \\
+ S1 & & 197.85$^{}$ \\
+  & & (-84.8 , 480.51) \\
+  & & \\
+ Sex & -106.58$^{*}$ & -82.86$^{}$ \\
+  & (-228.68 , 15.52) & (-210.32 , 44.6) \\
+  & & \\
+\hline \\[-1.8ex]
+ Observations & 442.0 & 442.0 \\
+ R${2}$ & 0.4 & 0.4 \\
+ Adjusted R${2}$ & 0.39 & 0.39 \\
+ Residual Std. Error & 59.98 & 59.98  \\
+ F Statistic & 72.91$^{***}$  & 48.91$^{***}$  \\
+\hline
+\hline \\[-1.8ex]
+\textit{Note:} & \multicolumn{2}{r}\textit{First note} \\
+ & \multicolumn{2}{r}\textit{Second note} \\
+\end{tabular}
+\end{table}
+
+\end{document}
+
+ 
