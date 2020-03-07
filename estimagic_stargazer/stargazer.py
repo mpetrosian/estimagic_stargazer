@@ -11,10 +11,10 @@ https://CRAN.R-project.org/package=stargazer
 """
 
 from __future__ import print_function
-from statsmodels.regression.linear_model import RegressionResultsWrapper
+#from statsmodels.regression.linear_model import RegressionResultsWrapper
 from numpy import round, sqrt
 import pandas as pd
-
+from collections import namedtuple
 # write functions to exctract params dataframe from statsmodels results
 def extract_params_from_sm(model):
     to_concat = []
@@ -67,22 +67,16 @@ class Stargazer:
 
         Any future checking will be added here.
         """
-        targets = []
-
+        targets = [
         for i, mod in enumerate(self.models):
-            #    if not isinstance(m, RegressionResultsWrapper):
-            #        raise ValueError('Please use trained OLS models as inputs')
-
-            # if targets.count(targets[0]) != len(targets):
-            #    raise ValueError('Please make sure OLS targets are identical')
-            if isinstance(mod, namedtuple):
+            if isinstance(mod, __main__.namedtuple):
                 pass
             elif isinstance(mod, dict):
-                mod_nt = namedtuple("mod_nt", "params info")
+                mod_nt = namedtuple("namedtiple", "params info")
                 self.models[i] = mod_nt(params=mod["params"], info=mod["info"])
             else:
                 try:
-                    mod_nt = namedtuple("mod_nt", "params info")
+                    mod_nt = namedtuple("namedtuple", "params info")
                     self.models[i] = mod_nt(
                         params=extract_params_from_sm(mod),
                         info={**extract_info_from_sm(mod)},
