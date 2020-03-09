@@ -91,7 +91,7 @@ class Stargazer:
                     raise
                 except:
                     raise TypeError(
-                        "Model {} does not have valid format".format(type(mod))
+                        "Model {} does not have valid format".format(mod)
                     )
 
     def reset_params(self):
