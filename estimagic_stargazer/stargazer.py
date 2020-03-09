@@ -108,8 +108,8 @@ class Stargazer:
         self.column_labels = None
         self.column_separators = None
         self.show_model_nums = True
-        self.original_cov_names = None  # param names
-        self.cov_map = (
+        self.original_param_names = None  # param names
+        self.param_map = (
             None
         )  # nice_names: dic to map  params names to new displayable names
         self.show_precision = True
@@ -141,26 +141,26 @@ class Stargazer:
         for m in self.models:
             self.model_data.append(self.extract_model_data(m))
 
-        covs = []
+        pars = []
         for md in self.model_data:
-            covs = covs + list(md["cov_names"])
-        self.cov_names = sorted(set(covs))
+            pars = pars + list(md["param_names"])
+        self.param_names = sorted(set(pars))
 
     def extract_model_data(self, model):  # assume model is namedtuple
         data = {}
-        data["cov_names"] = model.params.index.values
-        data["cov_values"] = model.params.value
+        data["param_names"] = model.params.index.values
+        data["param_values"] = model.params.value
         data["p_values"] = model.params.pvalue
-        data["cov_std_err"] = model.params.standard_error
-        data["conf_int_low_values"] = model.params.ci_lower
-        data["conf_int_high_values"] = model.params.ci_upper
-        data["r2"] = model.info["rsquared"]
-        data["r2_adj"] = model.info["rsquared_adj"]
-        data["resid_std_err"] = sqrt(model.info["scale"])
-        data["f_statistic"] = model.info["fvalue"]
-        data["f_p_value"] = model.info["f_pvalue"]
-        data["degree_freedom"] = model.info["df_model"]
-        data["degree_freedom_resid"] = model.info["df_resid"]
+        data["param_std_err"] = model.params.standard_error
+        data["ci_lower"] = model.params.ci_lower
+        data["ci_upper"] = model.params.ci_upper
+        data["r2"] = model.info.get("rsquared",None)
+        data["r2_adj"] = model.info.get("rsquared_adj",None)
+        data["resid_std_err"] = sqrt(model.info.get("scale",None))
+        data["f_statistic"] = model.info.get("fvalue",None)
+        data["f_p_value"] = model.info.get("f_pvalue",None)
+        data["degree_freedom"] = model.info.get("df_model",None)
+        data["degree_freedom_resid"] = model.info.get("df_resid",None)
 
         return data
 
@@ -221,24 +221,24 @@ class Stargazer:
         ), "Please input a string to use as the depedent variable name"
         self.dep_var_name = name
 
-    def covariate_order(self, cov_names):
-        missing = set(cov_names).difference(set(self.cov_names))
+    def covariate_order(self, param_names):
+        missing = set(param_names).difference(set(self.param_names))
         assert not missing, (
-            "Covariate order must contain subset of existing "
-            "covariates: {} are not.".format(missing)
+            "Parameter order must contain subset of existing "
+            "parameters: {} are not.".format(missing)
         )
-        self.original_cov_names = self.cov_names
-        self.cov_names = cov_names
+        self.original_param_names = self.param_names
+        self.param_names = param_names
 
-    def rename_covariates(self, cov_map):
+    def rename_covariates(self, param_map):
         assert isinstance(
-            cov_map, dict
-        ), "Please input a dictionary with covariate names as keys"
-        self.cov_map = cov_map
+            param_map, dict
+        ), "Please input a dictionary with parameter names as keys"
+        self.param_map = param_map
 
     def reset_covariate_order(self):
-        if self.original_cov_names is not None:
-            self.cov_names = self.original_cov_names
+        if self.original_param_names is not None:
+            self.param_names = self.original_param_names
 
     def show_degrees_of_freedom(self, show):
         assert type(show) == bool, "Please input True/False"
@@ -316,64 +316,64 @@ class Stargazer:
         covariate reporting is.
         """
         body = ""
-        for cov_name in self.cov_names:
-            body += self.generate_cov_rows_html(cov_name)
+        for param_name in self.param_names:
+            body += self.generate_cov_rows_html(param_name)
 
         return body
 
-    def generate_cov_rows_html(self, cov_name):
-        cov_text = ""
-        cov_text += self.generate_cov_main_html(cov_name)
+    def generate_cov_rows_html(self, param_name):
+        param_text = ""
+        param_text += self.generate_cov_main_html(param_name)
         if self.show_precision:
-            cov_text += self.generate_cov_precision_html(cov_name)
+            param_text += self.generate_cov_precision_html(param_name)
         else:
-            cov_text += "<tr></tr>"
+            param_text += "<tr></tr>"
 
-        return cov_text
+        return param_text
 
-    def generate_cov_main_html(self, cov_name):
-        cov_print_name = cov_name
-        if self.cov_map is not None:
-            cov_print_name = self.cov_map.get(cov_print_name, cov_name)
-        cov_text = '<tr><td style="text-align:left">' + cov_print_name + "</td>"
+    def generate_cov_main_html(self, param_name):
+        param_print_name = param_name
+        if self.param_map is not None:
+            param_print_name = self.param_map.get(param_print_name, param_name)
+        param_text = '<tr><td style="text-align:left">' + param_print_name + "</td>"
         for md in self.model_data:
-            if cov_name in md["cov_names"]:
-                cov_text += "<td>"
-                cov_text += str(round(md["cov_values"][cov_name], self.sig_digits))
+            if param_name in md["param_names"]:
+                param_text += "<td>"
+                param_text += str(round(md["param_values"][param_name], self.sig_digits))
                 if self.show_sig:
-                    cov_text += (
+                    param_text += (
                         "<sup>"
-                        + str(self.get_sig_icon(md["p_values"][cov_name]))
+                        + str(self.get_sig_icon(md["p_values"][param_name]))
                         + "</sup>"
                     )
-                cov_text += "</td>"
+                param_text += "</td>"
             else:
-                cov_text += "<td></td>"
-        cov_text += "</tr>"
+                param_text += "<td></td>"
+        param_text += "</tr>"
 
-        return cov_text
+        return param_text
 
-    def generate_cov_precision_html(self, cov_name):
-        cov_text = '<tr><td style="text-align:left"></td>'
+    def generate_cov_precision_html(self, param_name):
+        param_text = '<tr><td style="text-align:left"></td>'
         for md in self.model_data:
-            if cov_name in md["cov_names"]:
-                cov_text += "<td>("
+            if param_name in md["param_names"]:
+                param_text += "<td>("
                 if self.confidence_intervals:
-                    cov_text += (
-                        str(round(md["conf_int_low_values"][cov_name], self.sig_digits))
+                    param_text += (
+                        str(round(md["ci_lower"][param_name], self.sig_digits))
                         + " , "
                     )
-                    cov_text += str(
-                        round(md["conf_int_high_values"][cov_name], self.sig_digits)
+                    param_text += str(
+                        round(md["ci_upper"][param_name], self.sig_digits)
                     )
                 else:
-                    cov_text += str(round(md["cov_std_err"][cov_name], self.sig_digits))
-                cov_text += ")</td>"
+                    param_text += str(round(md["param_std_err"][param_name], self.sig_digits))
+                param_text += ")</td>"
             else:
-                cov_text += "<td></td>"
-        cov_text += "</tr>"
+                param_text += "<td></td>"
+        param_text += "</tr>"
 
-        return cov_text
+        return param_text
 
     def get_sig_icon(self, p_value, sig_char="*"):
         if p_value >= self.sig_levels[0]:
@@ -594,8 +594,8 @@ class Stargazer:
         covariate reporting is.
         """
         body = ""
-        for cov_name in self.cov_names:
-            body += self.generate_cov_rows_latex(cov_name)
+        for param_name in self.param_names:
+            body += self.generate_cov_rows_latex(param_name)
             body += "  "
             for _ in range(self.num_models):
                 body += "& "
@@ -603,62 +603,62 @@ class Stargazer:
 
         return body
 
-    def generate_cov_rows_latex(self, cov_name):
-        cov_text = ""
-        cov_text += self.generate_cov_main_latex(cov_name)
+    def generate_cov_rows_latex(self, param_name):
+        param_text = ""
+        param_text += self.generate_cov_main_latex(param_name)
         if self.show_precision:
-            cov_text += self.generate_cov_precision_latex(cov_name)
+            param_text += self.generate_cov_precision_latex(param_name)
         else:
-            cov_text += "& "
+            param_text += "& "
 
-        return cov_text
+        return param_text
 
-    def generate_cov_main_latex(self, cov_name):
-        cov_print_name = cov_name
+    def generate_cov_main_latex(self, param_name):
+        param_print_name = param_name
 
-        if self.cov_map is not None:
-            if cov_name in self.cov_map:
-                cov_print_name = self.cov_map[cov_name]
+        if self.param_map is not None:
+            if param_name in self.param_map:
+                param_print_name = self.param_map[param_name]
 
-        cov_text = " " + cov_print_name + " "
+        param_text = " " + param_print_name + " "
         for md in self.model_data:
-            if cov_name in md["cov_names"]:
-                cov_text += "& " + str(
-                    round(md["cov_values"][cov_name], self.sig_digits)
+            if param_name in md["param_names"]:
+                param_text += "& " + str(
+                    round(md["param_values"][param_name], self.sig_digits)
                 )
                 if self.show_sig:
-                    cov_text += (
-                        "$^{" + str(self.get_sig_icon(md["p_values"][cov_name])) + "}$"
+                    param_text += (
+                        "$^{" + str(self.get_sig_icon(md["p_values"][param_name])) + "}$"
                     )
-                cov_text += " "
+                param_text += " "
             else:
-                cov_text += "& "
-        cov_text += "\\\\\n"
+                param_text += "& "
+        param_text += "\\\\\n"
 
-        return cov_text
+        return param_text
 
-    def generate_cov_precision_latex(self, cov_name):
-        cov_text = "  "
+    def generate_cov_precision_latex(self, param_name):
+        param_text = "  "
 
         for md in self.model_data:
-            if cov_name in md["cov_names"]:
-                cov_text += "& ("
+            if param_name in md["param_names"]:
+                param_text += "& ("
                 if self.confidence_intervals:
-                    cov_text += (
-                        str(round(md["conf_int_low_values"][cov_name], self.sig_digits))
+                    param_text += (
+                        str(round(md["ci_lower"][param_name], self.sig_digits))
                         + " , "
                     )
-                    cov_text += str(
-                        round(md["conf_int_high_values"][cov_name], self.sig_digits)
+                    param_text += str(
+                        round(md["conf_int_high_values"][param_name], self.sig_digits)
                     )
                 else:
-                    cov_text += str(round(md["cov_std_err"][cov_name], self.sig_digits))
-                cov_text += ") "
+                    param_text += str(round(md["param_std_err"][param_name], self.sig_digits))
+                param_text += ") "
             else:
-                cov_text += "& "
-        cov_text += "\\\\\n"
+                param_text += "& "
+        param_text += "\\\\\n"
 
-        return cov_text
+        return param_text
 
     def generate_footer_latex(self, only_tabular=False):
         """
