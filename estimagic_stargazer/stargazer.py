@@ -104,7 +104,7 @@ class Stargazer:
         """
         self.title_text = None
         self.show_header = True
-        self.dep_var_name = "Dependent variable:"
+        self.model_name = "Model name:"
         self.column_labels = None
         self.column_separators = None
         self.show_model_nums = True
@@ -215,11 +215,11 @@ class Stargazer:
         assert type(show) == bool, "Please input True/False"
         self.confidence_intervals = show
 
-    def dependent_variable_name(self, name):
+    def model_name(self, name):
         assert (
             type(name) == str
-        ), "Please input a string to use as the depedent variable name"
-        self.dep_var_name = name
+        ), "Please input a string to use as the model name"
+        self.model_name = name
 
     def covariate_order(self, param_names):
         missing = set(param_names).difference(set(self.param_names))
@@ -280,11 +280,11 @@ class Stargazer:
             str(self.num_models + 1)
             + '" style="border-bottom: 1px solid black"></td></tr>'
         )
-        if self.dep_var_name is not None:
+        if self.model_name is not None:
             header += '<tr><td style="text-align:left"></td><td colspan="' + str(
                 self.num_models
             )
-            header += '"><em>' + self.dep_var_name + "</em></td></tr>"
+            header += '"><em>' + self.model_name + "</em></td></tr>"
 
         header += '<tr><td style="text-align:left"></td>'
         if self.column_labels is not None:
@@ -551,9 +551,9 @@ class Stargazer:
         header += "\\begin{tabular}{@{\\extracolsep{5pt}}lcc}\n"
         header += "\\\\[-1.8ex]\\hline\n"
         header += "\\hline \\\\[-1.8ex]\n"
-        if self.dep_var_name is not None:
+        if self.model_name is not None:
             header += "& \\multicolumn{" + str(self.num_models) + "}{c}"
-            header += "{\\textit{" + self.dep_var_name + "}} \\\n"
+            header += "{\\textit{" + self.model_name + "}} \\\n"
             header += (
                 "\\cr \\cline{"
                 + str(self.num_models)
@@ -649,7 +649,7 @@ class Stargazer:
                         + " , "
                     )
                     param_text += str(
-                        round(md["conf_int_high_values"][param_name], self.sig_digits)
+                        round(md["ci_upper"][param_name], self.sig_digits)
                     )
                 else:
                     param_text += str(round(md["param_std_err"][param_name], self.sig_digits))
