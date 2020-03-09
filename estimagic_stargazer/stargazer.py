@@ -15,6 +15,16 @@ from __future__ import print_function
 from numpy import round, sqrt
 import pandas as pd
 from collections import namedtuple
+
+# function to catch namedtuple instances
+def isnamedtupleinstance(obj):
+    t = type(obj)
+    b = t.__bases__
+    if len(b) != 1 or b[0] != tuple: return False
+    f = getattr(t, '_fields', None)
+    if not isinstance(f, tuple): return False
+    return all(type(n)==str for n in f)
+
 # write functions to exctract params dataframe from statsmodels results
 def extract_params_from_sm(model):
     to_concat = []
@@ -67,12 +77,12 @@ class Stargazer:
 
         Any future checking will be added here.
         """
-        targets = [
+        targets = []
         for i, mod in enumerate(self.models):
-            if isinstance(mod, __main__.namedtuple):
+            if isnamedtupleinstance(mod):
                 pass
             elif isinstance(mod, dict):
-                mod_nt = namedtuple("namedtiple", "params info")
+                named_tup = namedtuple("namedtiple", "params info")
                 self.models[i] = mod_nt(params=mod["params"], info=mod["info"])
             else:
                 try:
@@ -81,7 +91,7 @@ class Stargazer:
                         params=extract_params_from_sm(mod),
                         info={**extract_info_from_sm(mod)},
                     )
-                    targets.append(m.model.endog_names)
+                    targets.append(mod.model.endog_names)
                     self.dependent_variable = targets[0]
                 # assume its a statsmodels results object and convert it to the namedtuple we need
                 except (KeyboardInterrupt, SystemExit):
@@ -147,7 +157,7 @@ class Stargazer:
         data = {}
         data["cov_names"] = model.params.index.values
         data["cov_values"] = model.params.value
-        data["p_values"] = model.params.pvalues
+        data["p_values"] = model.params.pvalue
         data["cov_std_err"] = model.params.standard_error
         data["conf_int_low_values"] = model.params.ci_lower
         data["conf_int_high_values"] = model.params.ci_upper
@@ -156,7 +166,7 @@ class Stargazer:
         data["resid_std_err"] = sqrt(model.info["scale"])
         data["f_statistic"] = model.info["fvalue"]
         data["f_p_value"] = model.info["f_pvalue"]
-        data["degree_freedom"] = model.inof["df_model"]
+        data["degree_freedom"] = model.info["df_model"]
         data["degree_freedom_resid"] = model.info["df_resid"]
 
         return data
