@@ -16,14 +16,6 @@ from numpy import round, sqrt
 import pandas as pd
 from collections import namedtuple
 
-# function to catch namedtuple instances
-def isnamedtupleinstance(obj):
-    t = type(obj)
-    b = t.__bases__
-    if len(b) != 1 or b[0] != tuple: return False
-    f = getattr(t, '_fields', None)
-    if not isinstance(f, tuple): return False
-    return all(type(n)==str for n in f)
 
 # write functions to exctract params dataframe from statsmodels results
 def extract_params_from_sm(model):
@@ -79,15 +71,16 @@ class Stargazer:
         """
         targets = []
         for i, mod in enumerate(self.models):
-            if isnamedtupleinstance(mod):
-                pass
+            if hasattr(mod, "params") and hasattr(mod, "info"):
+                assert isinstance(mod.info, dict)
+                assert isinstance(mod.params, pd.DataFrame)
             elif isinstance(mod, dict):
-                named_tup = namedtuple("namedtiple", "params info")
-                self.models[i] = mod_nt(params=mod["params"], info=mod["info"])
+                NamedTup = namedtuple("NamedTup", "params info")
+                self.models[i] = NamedTup(params=mod["params"], info=mod["info"])
             else:
                 try:
-                    mod_nt = namedtuple("namedtuple", "params info")
-                    self.models[i] = mod_nt(
+                    NamedTup = namedtuple("NamedTup", "params info")
+                    self.models[i] = NamedTup(
                         params=extract_params_from_sm(mod),
                         info={**extract_info_from_sm(mod)},
                     )
