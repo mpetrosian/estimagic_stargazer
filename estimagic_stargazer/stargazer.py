@@ -468,7 +468,7 @@ class Stargazer:
                 rse_text += "<td> "
             else:
                 rse_text += "<td>" + str(round(md["resid_std_err"], self.sig_digits))
-                if self.show_dof and not isnan(md['degree_freedom_resid']):
+                if self.show_dof and not isnan(md["degree_freedom_resid"]):
                     rse_text += "(df = " + str(round(md["degree_freedom_resid"])) + ")"
             rse_text += "</td>"
         rse_text += "</tr>"
@@ -481,19 +481,19 @@ class Stargazer:
         f_text += '<tr><td style="text-align: left">F Statistic</td>'
         for md in self.model_data:
             if isnan(md["f_statistic"]):
-                f_text +=  "<td>"
+                f_text += "<td>"
             else:
                 f_text += "<td>" + str(round(md["f_statistic"], self.sig_digits))
                 f_text += "<sup>" + self.get_sig_icon(md["f_p_value"]) + "</sup>"
                 if self.show_dof:
                     ind_df = isnan(md["degree_freedom"])
                     ind_dfr = isnan(md["degree_freedom_resid"])
-                    ind = min(ind_df,ind_dfr)
-                    f_text += (1-ind)*(
+                    ind = min(ind_df, ind_dfr)
+                    f_text += (1 - ind) * (
                         "(df = "
-                        + (1-ind_df)*str(md["degree_freedom"])
+                        + (1 - ind_df) * str(md["degree_freedom"])
                         + "; "
-                        + (1-ind_dfr)*str(md["degree_freedom_resid"])
+                        + (1 - ind_dfr) * str(md["degree_freedom_resid"])
                         + ")"
                     )
             f_text += "</td>"
@@ -566,7 +566,7 @@ class Stargazer:
 
             header += "  \\label{}\n"
 
-        header += "\\begin{tabularx}{\\textwidth}{l"+self.num_models*"X"+"}\n"
+        header += "\\begin{tabularx}{\\textwidth}{l" + self.num_models * "X" + "}\n"
         header += "\\\\[-1.8ex]\\hline\n"
         header += "\\hline \\\\[-1.8ex]\n"
         if self.model_name is not None:
@@ -716,9 +716,7 @@ class Stargazer:
             if isnan(md["n_obs"]):
                 obs_text += "&   "
             else:
-                obs_text += (
-                "& " + str(md["n_obs"]) + " "
-            )
+                obs_text += "& " + str(md["n_obs"]) + " "
         obs_text += "\\\\\n"
         return obs_text
 
@@ -758,7 +756,7 @@ class Stargazer:
                 rse_text += "&  "
             else:
                 rse_text += "& " + str(round(md["resid_std_err"], self.sig_digits))
-                if self.show_dof and not isnan(md['degree_freedom_resid']):
+                if self.show_dof and not isnan(md["degree_freedom_resid"]):
                     rse_text += "(df = " + str(round(md["degree_freedom_resid"])) + ")"
             rse_text += " "
         rse_text += " \\\\\n"
@@ -780,14 +778,14 @@ class Stargazer:
                 if self.show_dof:
                     ind_df = isnan(md["degree_freedom"])
                     ind_dfr = isnan(md["degree_freedom_resid"])
-                    ind = min(ind_df,ind_dfr)
-                    f_text += (1-ind)*(
-                    "(df = "
-                    + (1-ind_df)*str(md["degree_freedom"])
-                    + "; "
-                    + (1-ind_dfr)*str(md["degree_freedom_resid"])
-                    + ")"
-                )
+                    ind = min(ind_df, ind_dfr)
+                    f_text += (1 - ind) * (
+                        "(df = "
+                        + (1 - ind_df) * str(md["degree_freedom"])
+                        + "; "
+                        + (1 - ind_dfr) * str(md["degree_freedom_resid"])
+                        + ")"
+                    )
             f_text += " "
         f_text += "\\\\\n"
         return f_text
