@@ -11,8 +11,9 @@ https://CRAN.R-project.org/package=stargazer
 """
 
 from __future__ import print_function
-#from statsmodels.regression.linear_model import RegressionResultsWrapper
-from numpy import round, sqrt, nan
+
+# from statsmodels.regression.linear_model import RegressionResultsWrapper
+from numpy import round, sqrt, nan, isnan
 import pandas as pd
 from collections import namedtuple
 
@@ -58,7 +59,7 @@ class Stargazer:
     """
 
     def __init__(self, models):
-        if  isinstance(models,list):
+        if isinstance(models, list):
             self.models = models
         else:
             self.models = [models]
@@ -92,9 +93,7 @@ class Stargazer:
                 except (KeyboardInterrupt, SystemExit):
                     raise
                 except:
-                    raise TypeError(
-                        "Model {} does not have valid format".format(mod)
-                    )
+                    raise TypeError("Model {} does not have valid format".format(mod))
 
     def reset_params(self):
         """
@@ -156,14 +155,17 @@ class Stargazer:
         data["param_std_err"] = model.params.standard_error
         data["ci_lower"] = model.params.ci_lower
         data["ci_upper"] = model.params.ci_upper
-        data["r2"] = model.info.get("rsquared",nan)
-        data["r2_adj"] = model.info.get("rsquared_adj",nan)
-        data["resid_std_err"] = sqrt(model.info.get("scale",nan))
-        data["f_statistic"] = model.info.get("fvalue",nan)
-        data["f_p_value"] = model.info.get("f_pvalue",nan)
-        data["degree_freedom"] = model.info.get("df_model",nan)
-        data["degree_freedom_resid"] = model.info.get("df_resid",nan)
-        data["dependent_variable"] = model.info.get("dependent_variable",nan)
+        data["r2"] = model.info.get("rsquared", nan)
+        data["r2_adj"] = model.info.get("rsquared_adj", nan)
+        data["resid_std_err"] = sqrt(model.info.get("scale", nan))
+        data["f_statistic"] = model.info.get("fvalue", nan)
+        data["f_p_value"] = model.info.get("f_pvalue", nan)
+        data["degree_freedom"] = model.info.get("df_model", nan)
+        data["degree_freedom_resid"] = model.info.get("df_resid", nan)
+        data["n_obs"] = model.info.get(
+            "n_obs", data["degree_freedom"] + data["degree_freedom_resid"] + 1
+        )
+        data["dependent_variable"] = model.info.get("dependent_variable", nan)
         return data
 
     # Begin render option functions
@@ -218,9 +220,7 @@ class Stargazer:
         self.confidence_intervals = show
 
     def model_name(self, name):
-        assert (
-            type(name) == str
-        ), "Please input a string to use as the model name"
+        assert type(name) == str, "Please input a string to use as the model name"
         self.model_name = name
 
     def covariate_order(self, param_names):
@@ -341,7 +341,9 @@ class Stargazer:
         for md in self.model_data:
             if param_name in md["param_names"]:
                 param_text += "<td>"
-                param_text += str(round(md["param_values"][param_name], self.sig_digits))
+                param_text += str(
+                    round(md["param_values"][param_name], self.sig_digits)
+                )
                 if self.show_sig:
                     param_text += (
                         "<sup>"
@@ -362,14 +364,15 @@ class Stargazer:
                 param_text += "<td>("
                 if self.confidence_intervals:
                     param_text += (
-                        str(round(md["ci_lower"][param_name], self.sig_digits))
-                        + " , "
+                        str(round(md["ci_lower"][param_name], self.sig_digits)) + " , "
                     )
                     param_text += str(
                         round(md["ci_upper"][param_name], self.sig_digits)
                     )
                 else:
-                    param_text += str(round(md["param_std_err"][param_name], self.sig_digits))
+                    param_text += str(
+                        round(md["param_std_err"][param_name], self.sig_digits)
+                    )
                 param_text += ")</td>"
             else:
                 param_text += "<td></td>"
@@ -423,11 +426,10 @@ class Stargazer:
             return obs_text
         obs_text += '<tr><td style="text-align: left">Observations</td>'
         for md in self.model_data:
-            obs_text += (
-                "<td>"
-                + str(md["degree_freedom"] + md["degree_freedom_resid"] + 1)
-                + "</td>"
-            )
+            if isnan(md["n_obs"]):
+                obs_text += "<td> N/A </td>"
+            else:
+                obs_text += "<td>" + str(md["n_obs"]) + "</td>"
         obs_text += "</tr>"
         return obs_text
 
@@ -630,7 +632,9 @@ class Stargazer:
                 )
                 if self.show_sig:
                     param_text += (
-                        "$^{" + str(self.get_sig_icon(md["p_values"][param_name])) + "}$"
+                        "$^{"
+                        + str(self.get_sig_icon(md["p_values"][param_name]))
+                        + "}$"
                     )
                 param_text += " "
             else:
@@ -647,14 +651,15 @@ class Stargazer:
                 param_text += "& ("
                 if self.confidence_intervals:
                     param_text += (
-                        str(round(md["ci_lower"][param_name], self.sig_digits))
-                        + " , "
+                        str(round(md["ci_lower"][param_name], self.sig_digits)) + " , "
                     )
                     param_text += str(
                         round(md["ci_upper"][param_name], self.sig_digits)
                     )
                 else:
-                    param_text += str(round(md["param_std_err"][param_name], self.sig_digits))
+                    param_text += str(
+                        round(md["param_std_err"][param_name], self.sig_digits)
+                    )
                 param_text += ") "
             else:
                 param_text += "& "
