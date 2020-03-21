@@ -12,7 +12,7 @@ https://CRAN.R-project.org/package=stargazer
 
 from __future__ import print_function
 #from statsmodels.regression.linear_model import RegressionResultsWrapper
-from numpy import round, sqrt
+from numpy import round, sqrt, nan
 import pandas as pd
 from collections import namedtuple
 
@@ -43,6 +43,7 @@ def extract_info_from_sm(model):
     ]
     for kv in key_values:
         info[kv] = getattr(model, kv)
+    info["dependent_variable"] = model.model.endog_names
     return info
 
 
@@ -57,8 +58,11 @@ class Stargazer:
     """
 
     def __init__(self, models):
-        self.models = models
-        self.num_models = len(models)
+        if  isinstance(models,list):
+            self.models = models
+        else:
+            self.models = [models]
+        self.num_models = len(self.models)
         self.extract_data()
         self.reset_params()
 
@@ -84,8 +88,6 @@ class Stargazer:
                         params=extract_params_from_sm(mod),
                         info={**extract_info_from_sm(mod)},
                     )
-                    targets.append(mod.model.endog_names)
-                    self.dependent_variable = targets[0]
                 # assume its a statsmodels results object and convert it to the namedtuple we need
                 except (KeyboardInterrupt, SystemExit):
                     raise
@@ -154,14 +156,14 @@ class Stargazer:
         data["param_std_err"] = model.params.standard_error
         data["ci_lower"] = model.params.ci_lower
         data["ci_upper"] = model.params.ci_upper
-        data["r2"] = model.info.get("rsquared",None)
-        data["r2_adj"] = model.info.get("rsquared_adj",None)
-        data["resid_std_err"] = sqrt(model.info.get("scale",None))
-        data["f_statistic"] = model.info.get("fvalue",None)
-        data["f_p_value"] = model.info.get("f_pvalue",None)
-        data["degree_freedom"] = model.info.get("df_model",None)
-        data["degree_freedom_resid"] = model.info.get("df_resid",None)
-
+        data["r2"] = model.info.get("rsquared",nan)
+        data["r2_adj"] = model.info.get("rsquared_adj",nan)
+        data["resid_std_err"] = sqrt(model.info.get("scale",nan))
+        data["f_statistic"] = model.info.get("fvalue",nan)
+        data["f_p_value"] = model.info.get("f_pvalue",nan)
+        data["degree_freedom"] = model.info.get("df_model",nan)
+        data["degree_freedom_resid"] = model.info.get("df_resid",nan)
+        data["dependent_variable"] = model.info.get("dependent_variable",nan)
         return data
 
     # Begin render option functions
