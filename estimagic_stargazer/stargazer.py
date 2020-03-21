@@ -104,12 +104,12 @@ class Stargazer:
         """
         self.title_text = None
         self.show_header = True
-        self.model_name = "Model name:"
+        self.model_name = ""
         self.column_labels = None
         self.column_separators = None
         self.show_model_nums = True
         self.original_param_names = None  # param names
-        self.param_map = (
+        self.param_nicer_names = (
             None
         )  # nice_names: dic to map  params names to new displayable names
         self.show_precision = True
@@ -231,11 +231,11 @@ class Stargazer:
         self.original_param_names = self.param_names
         self.param_names = param_names
 
-    def rename_covariates(self, param_map):
+    def rename_covariates(self, param_nicer_names):
         assert isinstance(
-            param_map, dict
+            param_nicer_names, dict
         ), "Please input a dictionary with parameter names as keys"
-        self.param_map = param_map
+        self.param_nicer_names = param_nicer_names
 
     def reset_covariate_order(self):
         if self.original_param_names is not None:
@@ -318,24 +318,24 @@ class Stargazer:
         """
         body = ""
         for param_name in self.param_names:
-            body += self.generate_cov_rows_html(param_name)
+            body += self.generate_param_rows_html(param_name)
 
         return body
 
-    def generate_cov_rows_html(self, param_name):
+    def generate_param_rows_html(self, param_name):
         param_text = ""
-        param_text += self.generate_cov_main_html(param_name)
+        param_text += self.generate_param_main_html(param_name)
         if self.show_precision:
-            param_text += self.generate_cov_precision_html(param_name)
+            param_text += self.generate_param_precision_html(param_name)
         else:
             param_text += "<tr></tr>"
 
         return param_text
 
-    def generate_cov_main_html(self, param_name):
+    def generate_param_main_html(self, param_name):
         param_print_name = param_name
-        if self.param_map is not None:
-            param_print_name = self.param_map.get(param_print_name, param_name)
+        if self.param_nicer_names is not None:
+            param_print_name = self.param_nicer_names.get(param_print_name, param_name)
         param_text = '<tr><td style="text-align:left">' + param_print_name + "</td>"
         for md in self.model_data:
             if param_name in md["param_names"]:
@@ -356,7 +356,7 @@ class Stargazer:
 
         return param_text
 
-    def generate_cov_precision_html(self, param_name):
+    def generate_param_precision_html(self, param_name):
         param_text = '<tr><td style="text-align:left"></td>'
         for md in self.model_data:
             if param_name in md["param_names"]:
@@ -613,7 +613,7 @@ class Stargazer:
         """
         body = ""
         for param_name in self.param_names:
-            body += self.generate_cov_rows_latex(param_name)
+            body += self.generate_param_rows_latex(param_name)
             body += "  "
             for _ in range(self.num_models):
                 body += "& "
@@ -621,22 +621,22 @@ class Stargazer:
 
         return body
 
-    def generate_cov_rows_latex(self, param_name):
+    def generate_param_rows_latex(self, param_name):
         param_text = ""
-        param_text += self.generate_cov_main_latex(param_name)
+        param_text += self.generate_param_main_latex(param_name)
         if self.show_precision:
-            param_text += self.generate_cov_precision_latex(param_name)
+            param_text += self.generate_param_precision_latex(param_name)
         else:
             param_text += "& "
 
         return param_text
 
-    def generate_cov_main_latex(self, param_name):
+    def generate_param_main_latex(self, param_name):
         param_print_name = param_name
 
-        if self.param_map is not None:
-            if param_name in self.param_map:
-                param_print_name = self.param_map[param_name]
+        if self.param_nicer_names is not None:
+            if param_name in self.param_nicer_names:
+                param_print_name = self.param_nicer_names[param_name]
 
         param_text = " " + param_print_name + " "
         for md in self.model_data:
@@ -657,7 +657,7 @@ class Stargazer:
 
         return param_text
 
-    def generate_cov_precision_latex(self, param_name):
+    def generate_param_precision_latex(self, param_name):
         param_text = "  "
 
         for md in self.model_data:
