@@ -74,7 +74,6 @@ class Stargazer:
 
         Any future checking will be added here.
         """
-        targets = []
         for i, mod in enumerate(self.models):
             if hasattr(mod, "params") and hasattr(mod, "info"):
                 assert isinstance(mod.info, dict)
@@ -427,7 +426,7 @@ class Stargazer:
         obs_text += '<tr><td style="text-align: left">Observations</td>'
         for md in self.model_data:
             if isnan(md["n_obs"]):
-                obs_text += "<td> N/A </td>"
+                obs_text += "<td>  </td>"
             else:
                 obs_text += "<td>" + str(md["n_obs"]) + "</td>"
         obs_text += "</tr>"
@@ -439,7 +438,10 @@ class Stargazer:
             return r2_text
         r2_text += '<tr><td style="text-align: left">R<sup>2</sup></td>'
         for md in self.model_data:
-            r2_text += "<td>" + str(round(md["r2"], self.sig_digits)) + "</td>"
+            if isnan(md["r2"]):
+                r2_text += "<td> </td>"
+            else:
+                r2_text += "<td>" + str(round(md["r2"], self.sig_digits)) + "</td>"
         r2_text += "</tr>"
         return r2_text
 
@@ -449,7 +451,10 @@ class Stargazer:
             return r2_text
         r2_text += '<tr><td style="text-align: left">Adjusted R<sup>2</sup></td>'
         for md in self.model_data:
-            r2_text += "<td>" + str(round(md["r2_adj"], self.sig_digits)) + "</td>"
+            if isnan(md["r2_adj"]):
+                r2_text += "<td>  </td>"
+            else:
+                r2_text += "<td>" + str(round(md["r2_adj"], self.sig_digits)) + "</td>"
         r2_text += "</tr>"
         return r2_text
 
@@ -459,9 +464,12 @@ class Stargazer:
             return rse_text
         rse_text += '<tr><td style="text-align: left">Residual Std. Error</td>'
         for md in self.model_data:
-            rse_text += "<td>" + str(round(md["resid_std_err"], self.sig_digits))
-            if self.show_dof:
-                rse_text += "(df = " + str(round(md["degree_freedom_resid"])) + ")"
+            if isnan(md["resid_std_err"]):
+                rse_text += "<td> "
+            else:
+                rse_text += "<td>" + str(round(md["resid_std_err"], self.sig_digits))
+                if self.show_dof and not isnan(md['degree_freedom_resid']):
+                    rse_text += "(df = " + str(round(md["degree_freedom_resid"])) + ")"
             rse_text += "</td>"
         rse_text += "</tr>"
         return rse_text
@@ -472,16 +480,22 @@ class Stargazer:
             return f_text
         f_text += '<tr><td style="text-align: left">F Statistic</td>'
         for md in self.model_data:
-            f_text += "<td>" + str(round(md["f_statistic"], self.sig_digits))
-            f_text += "<sup>" + self.get_sig_icon(md["f_p_value"]) + "</sup>"
-            if self.show_dof:
-                f_text += (
-                    "(df = "
-                    + str(md["degree_freedom"])
-                    + "; "
-                    + str(md["degree_freedom_resid"])
-                    + ")"
-                )
+            if isnan(md["f_statistic"]):
+                f_text +=  "<td>"
+            else:
+                f_text += "<td>" + str(round(md["f_statistic"], self.sig_digits))
+                f_text += "<sup>" + self.get_sig_icon(md["f_p_value"]) + "</sup>"
+                if self.show_dof:
+                    ind_df = isnan(md["degree_freedom"])
+                    ind_dfr = isnan(md["degree_freedom_resid"])
+                    ind = min(ind_df,ind_dfr)
+                    f_text += (1-ind)*(
+                        "(df = "
+                        + (1-ind_df)*str(md["degree_freedom"])
+                        + "; "
+                        + (1-ind_dfr)*str(md["degree_freedom_resid"])
+                        + ")"
+                    )
             f_text += "</td>"
         f_text += "</tr>"
         return f_text
