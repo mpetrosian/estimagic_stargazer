@@ -120,11 +120,11 @@ class Stargazer:
         self.show_footer = True
         self.custom_footer_text = []
         self.show_n = True
-        self.show_r2 = True  # falses
-        self.show_adj_r2 = True  # false
-        self.show_residual_std_err = True  # false
-        self.show_f_statistic = True  # false
-        self.show_dof = True  #
+        self.show_r2 = False  # falses
+        self.show_adj_r2 = False  # false
+        self.show_residual_std_err = False  # false
+        self.show_f_statistic = False  # false
+        self.show_dof = False  #
         self.show_notes = True
         self.notes_label = "Note:"
         self.notes_append = True
