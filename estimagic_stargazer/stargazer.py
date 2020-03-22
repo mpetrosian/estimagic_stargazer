@@ -13,7 +13,7 @@ https://CRAN.R-project.org/package=stargazer
 from __future__ import print_function
 
 # from statsmodels.regression.linear_model import RegressionResultsWrapper
-from numpy import round, sqrt, nan, isnan
+from numpy import round, sqrt, nan, isnan, digitize
 import pandas as pd
 from collections import namedtuple
 
@@ -64,8 +64,8 @@ class Stargazer:
         else:
             self.models = [models]
         self.num_models = len(self.models)
-        self.extract_data()
         self.reset_params()
+        self.extract_data()
 
     def validate_input(self):
         """
@@ -114,16 +114,16 @@ class Stargazer:
         )  # nice_names: dic to map  params names to new displayable names
         self.show_precision = True
         self.show_sig = True  # show stars
-        self.sig_levels = [0.1, 0.05, 0.01]
+        self.sig_levels = [0.1, 0.05, 0.03,0.01]
         self.sig_digits = 3
         self.confidence_intervals = False
         self.show_footer = True
         self.custom_footer_text = []
         self.show_n = True
-        self.show_r2 = False  # falses
-        self.show_adj_r2 = False  # false
+        self.show_r2 = True  # falses
+        self.show_adj_r2 = True  # false
         self.show_residual_std_err = False  # false
-        self.show_f_statistic = False  # false
+        self.show_f_statistic = True  # false
         self.show_dof = False  #
         self.show_notes = True
         self.notes_label = "Note:"
@@ -165,6 +165,20 @@ class Stargazer:
             "n_obs", data["degree_freedom"] + data["degree_freedom_resid"] + 1
         )
         data["dependent_variable"] = model.info.get("dependent_variable", nan)
+        # generate significance icons
+        sig_bins = [-1] + sorted(self.sig_levels) + [2]
+        data["sig_icons"] = pd.cut(
+            data["p_values"],
+            bins=sig_bins,
+            labels=[
+                "*" * (len(self.sig_levels) - i) for i in range(len(self.sig_levels) + 1)
+            ],
+        )
+        data["sig_icon_fstat"] = (
+            "*"
+            * (1 - isnan(data["f_p_value"]))
+            * (len(self.sig_levels) - digitize(data["f_p_value"], sig_bins) + 1)
+        )
         return data
 
     # Begin render option functions
@@ -203,7 +217,7 @@ class Stargazer:
         self.column_separators = separators
 
     def significance_levels(self, levels):
-        assert len(levels) == 3, "Please input 3 significance levels"
+        #        assert len(levels) == 3, "Please input 3 significance levels"
         assert (
             sum([int(type(l) != float) for l in levels]) == 0
         ), "Please input floating point values as significance levels"
@@ -344,11 +358,7 @@ class Stargazer:
                     round(md["param_values"][param_name], self.sig_digits)
                 )
                 if self.show_sig:
-                    param_text += (
-                        "<sup>"
-                        + str(self.get_sig_icon(md["p_values"][param_name]))
-                        + "</sup>"
-                    )
+                    param_text += "<sup>" + str(md["sig_icons"][param_name]) + "</sup>"
                 param_text += "</td>"
             else:
                 param_text += "<td></td>"
@@ -380,14 +390,16 @@ class Stargazer:
         return param_text
 
     def get_sig_icon(self, p_value, sig_char="*"):
-        if p_value >= self.sig_levels[0]:
-            return ""
-        elif p_value >= self.sig_levels[1]:
-            return sig_char
-        elif p_value >= self.sig_levels[2]:
-            return sig_char * 2
+        res_sig = ""
+        sig_levels = sorted(self.sig_levels)
+
+        if p_value < sig_levels[0]:
+            res_sig += sig_char * len(listt)
         else:
-            return sig_char * 3
+            for i in np.arange(len(sig_levels[1:])) + 1:
+                if sig_levels[i - 1] <= p_value < sig_levels[i]:
+                    res_sig += sig_char * (len(sig_levels) - i)
+        return res_sig
 
     def generate_footer_html(self):
         """
@@ -484,7 +496,7 @@ class Stargazer:
                 f_text += "<td>"
             else:
                 f_text += "<td>" + str(round(md["f_statistic"], self.sig_digits))
-                f_text += "<sup>" + self.get_sig_icon(md["f_p_value"]) + "</sup>"
+                f_text += "<sup>" + md["sig_icon_fstat"] + "</sup>"
                 if self.show_dof:
                     ind_df = isnan(md["degree_freedom"])
                     ind_dfr = isnan(md["degree_freedom_resid"])
@@ -517,14 +529,18 @@ class Stargazer:
         return notes_text
 
     def generate_p_value_section_html(self):
+        sig_levels = sorted(self.sig_levels)
         notes_text = """
- <td colspan="{}" style="text-align: right">
-  <sup>*</sup>p&lt;{};
-  <sup>**</sup>p&lt;{};
-  <sup>***</sup>p&lt;{}
- </td>""".format(
-            self.num_models, *self.sig_levels
+ <td colspan="{}" style="text-align: right">""".format(
+            self.num_models
         )
+        for i in range(len(sig_levels) - 1):
+            notes_text += (
+                "<sup>"
+                + "*" * (len(sig_levels) - i)
+                + """</sup>p&lt;{}; """.format(sig_levels[i])
+            )
+        notes_text += """<sup>*</sup>p&lt;{} </td>""".format(sig_levels[-1])
         return notes_text
 
     def generate_additional_notes_html(self):
@@ -645,11 +661,7 @@ class Stargazer:
                     round(md["param_values"][param_name], self.sig_digits)
                 )
                 if self.show_sig:
-                    param_text += (
-                        "$^{"
-                        + str(self.get_sig_icon(md["p_values"][param_name]))
-                        + "}$"
-                    )
+                    param_text += "$^{" + str(md["sig_icons"][param_name]) + "}$"
                 param_text += " "
             else:
                 param_text += "& "
@@ -774,7 +786,7 @@ class Stargazer:
                 f_text += "&    "
             else:
                 f_text += "& " + str(round(md["f_statistic"], self.sig_digits))
-                f_text += "$^{" + self.get_sig_icon(md["f_p_value"]) + "}$ "
+                f_text += "$^{" + md["sig_icon_fstat"] + "}$ "
                 if self.show_dof:
                     ind_df = isnan(md["degree_freedom"])
                     ind_dfr = isnan(md["degree_freedom_resid"])
@@ -804,30 +816,18 @@ class Stargazer:
         return notes_text
 
     def generate_p_value_section_latex(self):
+        sig_levels = sorted(self.sig_levels)
         notes_text = ""
-        notes_text += (
-            " & \\multicolumn{"
-            + str(self.num_models)
-            + "}{r}{$^{"
-            + self.get_sig_icon(self.sig_levels[0] - 0.001)
-            + "}$p$<$"
-            + str(self.sig_levels[0])
-            + "; "
-        )
-        notes_text += (
-            "$^{"
-            + self.get_sig_icon(self.sig_levels[1] - 0.001)
-            + "}$p$<$"
-            + str(self.sig_levels[1])
-            + "; "
-        )
-        notes_text += (
-            "$^{"
-            + self.get_sig_icon(self.sig_levels[2] - 0.001)
-            + "}$p$<$"
-            + str(self.sig_levels[2])
-            + "} \\\\\n"
-        )
+        notes_text += " & \\multicolumn{" + str(self.num_models) + "}{r}{"
+        for i in range(len(sig_levels) - 1):
+            notes_text += (
+                "$^{"
+                + "*" * (len(sig_levels) - i)
+                + "}$p$<$"
+                + str(sig_levels[i])
+                + "; "
+            )
+        notes_text += "$^{*}$p$<$" + str(sig_levels[-1]) + "} \\\\\n"
         return notes_text
 
     def generate_additional_notes_latex(self):
