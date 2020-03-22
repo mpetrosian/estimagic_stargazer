@@ -114,7 +114,7 @@ class Stargazer:
         )  # nice_names: dic to map  params names to new displayable names
         self.show_precision = True
         self.show_sig = True  # show stars
-        self.sig_levels = [0.1, 0.05, 0.03,0.01]
+        self.sig_levels = [0.1, 0.05, 0.03, 0.01]
         self.sig_digits = 3
         self.confidence_intervals = False
         self.show_footer = True
@@ -171,7 +171,8 @@ class Stargazer:
             data["p_values"],
             bins=sig_bins,
             labels=[
-                "*" * (len(self.sig_levels) - i) for i in range(len(self.sig_levels) + 1)
+                "*" * (len(self.sig_levels) - i)
+                for i in range(len(self.sig_levels) + 1)
             ],
         )
         data["sig_icon_fstat"] = (
