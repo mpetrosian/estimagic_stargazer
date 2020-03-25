@@ -145,6 +145,35 @@ class Stargazer:
         for md in self.model_data:
             pars = pars + list(md["param_names"])
         self.param_names = sorted(set(pars))
+        nlevels = self.models[0].params.index.nlevels
+        # generate the first coluimn of table
+        metalist = [[] for i in range(nlevels)]
+        # ith list in the list is the ith index level value
+        for i in range(nlevels):
+            for p in self.param_names:
+                if isinstance(pars[0], tuple):
+                    metalist[i].append(p[i])
+                else:
+                    metalist[i].append(p)
+        # the below list contains lists of indices where repeated
+        # subsequent values are replaced by emppty string
+        ulist = [[] for i in range(nlevels)]
+        for i, l in enumerate(metalist):
+            for j, n in enumerate(l):
+                if j == 0:
+                    ulist[i].append(str(n))
+                elif j > 0:
+                    if l[j] == l[j - 1]:
+                        ulist[i].append("")
+                    else:
+                        ulist[i].append(str(n))
+        df = pd.DataFrame(ulist).transpose()
+        if isinstance(pars[0], tuple):
+            df.index = pd.MultiIndex.from_tuples(self.param_names)
+        else:
+            df.index = self.param_names
+
+        self.first_table_col = df
 
     def extract_model_data(self, model):  # assume model is namedtuple
         data = {}
@@ -218,7 +247,6 @@ class Stargazer:
         self.column_separators = separators
 
     def significance_levels(self, levels):
-        #        assert len(levels) == 3, "Please input 3 significance levels"
         assert (
             sum([int(type(l) != float) for l in levels]) == 0
         ), "Please input floating point values as significance levels"
@@ -293,23 +321,38 @@ class Stargazer:
 
         header += '<table style="text-align:center"><tr><td colspan="'
         header += (
-            str(self.num_models + 1)
+            str(self.num_models + len(self.first_table_col.columns))
             + '" style="border-bottom: 1px solid black"></td></tr>'
         )
         if self.model_name is not None:
             header += '<tr><td style="text-align:left"></td><td colspan="' + str(
-                self.num_models
+                self.num_models + len(self.first_table_col.columns) - 1
             )
             header += '"><em>' + self.model_name + "</em></td></tr>"
 
         header += '<tr><td style="text-align:left"></td>'
+
         if self.column_labels is not None:
             if type(self.column_labels) == str:
+                if len(self.first_table_col.columns) > 1:
+                    header += (
+                        '<td colspan="'
+                        + str(len(self.first_table_col.columns) - 1)
+                        + '">'
+                        + " </td>"
+                    )
                 header += '<td colspan="' + str(self.num_models) + '">'
                 header += self.column_labels + "</td></tr>"
             else:
                 # The first table column holds the covariates names:
                 header += "<tr><td></td>"
+                if len(self.first_table_col.columns) > 1:
+                    header += (
+                        '<td colspan="'
+                        + str(len(self.first_table_col.columns) - 1)
+                        + '">'
+                        + "</td>"
+                    )
                 for i, label in enumerate(self.column_labels):
                     sep = self.column_separators[i]
                     header += '<td colspan="{}">{}</td>'.format(sep, label)
@@ -317,11 +360,22 @@ class Stargazer:
 
         if self.show_model_nums:
             header += '<tr><td style="text-align:left"></td>'
+            if len(self.first_table_col.columns) > 1:
+                header += (
+                    '<td colspan="'
+                    + str(len(self.first_table_col.columns) - 1)
+                    + '">'
+                    + "</td>"
+                )
             for num in range(1, self.num_models + 1):
                 header += "<td>(" + str(num) + ")</td>"
             header += "</tr>"
-
-        header += '<tr><td colspan="' + str(self.num_models + 1)
+        if len(self.first_table_col.columns) > 1:
+            header += '<tr><td colspan="' + str(
+                self.num_models + len(self.first_table_col.columns) + 1
+            )
+        else:
+            header += '<tr><td colspan="' + str(self.num_models + 1)
         header += '" style="border-bottom: 1px solid black"></td></tr>'
 
         return header
@@ -348,12 +402,32 @@ class Stargazer:
         return param_text
 
     def generate_param_main_html(self, param_name):
-        param_print_name = param_name
+        # param_name is unique
+        # names
+        if isinstance(param_name, tuple):
+            param_print_name = param_name[-1]
+        else:
+            param_print_name = param_name
         if self.param_nicer_names is not None:
             param_print_name = self.param_nicer_names.get(param_print_name, param_name)
-        param_text = '<tr><td style="text-align:left">' + param_print_name + "</td>"
+        param_text = "<tr>"
+        if not isinstance(param_name, tuple):
+            param_text += (
+                '<td style="text-align:left">' + param_print_name + "&nbsp;</td>"
+            )
+        else:
+            for i in range(len(param_name) - 1):
+                param_text += (
+                    '<td style="text-align:left">'
+                    + str(self.first_table_col.loc[param_name][i])
+                    + "&nbsp;</td>"
+                )
+            param_text += (
+                '<td style="text-align:left">' + param_print_name + "&nbsp;</td>"
+            )
+        # values
         for md in self.model_data:
-            if param_name in md["param_names"]:
+            if param_name in list(md["param_names"]):
                 param_text += "<td>"
                 param_text += str(
                     round(md["param_values"][param_name], self.sig_digits)
@@ -368,10 +442,18 @@ class Stargazer:
         return param_text
 
     def generate_param_precision_html(self, param_name):
+
         param_text = '<tr><td style="text-align:left"></td>'
+        if isinstance(param_name, tuple):
+            param_text += (
+                '<td colspan="'
+                + str(len(self.first_table_col.columns) - 1)
+                + '">'
+                + "</td>"
+            )
         for md in self.model_data:
-            if param_name in md["param_names"]:
-                param_text += "<td>("
+            if param_name in list(md["param_names"]):
+                param_text += "<td>&nbsp;("
                 if self.confidence_intervals:
                     param_text += (
                         str(round(md["ci_lower"][param_name], self.sig_digits)) + " , "
@@ -390,17 +472,18 @@ class Stargazer:
 
         return param_text
 
-    def get_sig_icon(self, p_value, sig_char="*"):
-        res_sig = ""
-        sig_levels = sorted(self.sig_levels)
-
-        if p_value < sig_levels[0]:
-            res_sig += sig_char * len(listt)
-        else:
-            for i in np.arange(len(sig_levels[1:])) + 1:
-                if sig_levels[i - 1] <= p_value < sig_levels[i]:
-                    res_sig += sig_char * (len(sig_levels) - i)
-        return res_sig
+    # the below function is redundant
+    # def get_sig_icon(self, p_value, sig_char="*"):
+    #    res_sig = ""
+    #        sig_levels = sorted(self.sig_levels)#
+    #
+    #        if p_value < sig_levels[0]:
+    #            res_sig += sig_char * len(listt)
+    #        else:
+    #            for i in np.arange(len(sig_levels[1:])) + 1:
+    #                if sig_levels[i - 1] <= p_value < sig_levels[i]:
+    #                    res_sig += sig_char * (len(sig_levels) - i)
+    #        return res_sig
 
     def generate_footer_html(self):
         """
@@ -409,7 +492,7 @@ class Stargazer:
         """
         footer = (
             '<td colspan="'
-            + str(self.num_models + 1)
+            + str(self.num_models + len(self.first_table_col.columns))
             + '" style="border-bottom: 1px solid black"></td></tr>'
         )
 
@@ -424,7 +507,7 @@ class Stargazer:
             footer += self.generate_f_statistic_html()
         footer += (
             '<tr><td colspan="'
-            + str(self.num_models + 1)
+            + str(self.num_models + len(self.first_table_col.columns))
             + '" style="border-bottom: 1px solid black"></td></tr>'
         )
         footer += self.generate_notes_html()
@@ -437,11 +520,19 @@ class Stargazer:
         if not self.show_n:
             return obs_text
         obs_text += '<tr><td style="text-align: left">Observations</td>'
+        if len(self.first_table_col.columns) > 1:
+            obs_text += (
+                '<td colspan="'
+                + str(len(self.first_table_col.columns) - 1)
+                + '">'
+                + "</td>"
+            )
         for md in self.model_data:
             if isnan(md["n_obs"]):
                 obs_text += "<td>  </td>"
             else:
                 obs_text += "<td>" + str(md["n_obs"]) + "</td>"
+
         obs_text += "</tr>"
         return obs_text
 
@@ -450,6 +541,13 @@ class Stargazer:
         if not self.show_r2:
             return r2_text
         r2_text += '<tr><td style="text-align: left">R<sup>2</sup></td>'
+        if len(self.first_table_col.columns) > 1:
+            r2_text += (
+                '<td colspan="'
+                + str(len(self.first_table_col.columns) - 1)
+                + '">'
+                + "</td>"
+            )
         for md in self.model_data:
             if isnan(md["r2"]):
                 r2_text += "<td> </td>"
@@ -463,6 +561,13 @@ class Stargazer:
         if not self.show_r2:
             return r2_text
         r2_text += '<tr><td style="text-align: left">Adjusted R<sup>2</sup></td>'
+        if len(self.first_table_col.columns) > 1:
+            r2_text += (
+                '<td colspan="'
+                + str(len(self.first_table_col.columns) - 1)
+                + '">'
+                + "</td>"
+            )
         for md in self.model_data:
             if isnan(md["r2_adj"]):
                 r2_text += "<td>  </td>"
@@ -476,6 +581,13 @@ class Stargazer:
         if not self.show_r2:
             return rse_text
         rse_text += '<tr><td style="text-align: left">Residual Std. Error</td>'
+        if len(self.first_table_col.columns) > 1:
+            rse_text += (
+                '<td colspan="'
+                + str(len(self.first_table_col.columns) - 1)
+                + '">'
+                + "</td>"
+            )
         for md in self.model_data:
             if isnan(md["resid_std_err"]):
                 rse_text += "<td> "
@@ -492,6 +604,13 @@ class Stargazer:
         if not self.show_r2:
             return f_text
         f_text += '<tr><td style="text-align: left">F Statistic</td>'
+        if len(self.first_table_col.columns) > 1:
+            f_text += (
+                '<td colspan="'
+                + str(len(self.first_table_col.columns) - 1)
+                + '">'
+                + "</td>"
+            )
         for md in self.model_data:
             if isnan(md["f_statistic"]):
                 f_text += "<td>"
@@ -533,7 +652,7 @@ class Stargazer:
         sig_levels = sorted(self.sig_levels)
         notes_text = """
  <td colspan="{}" style="text-align: right">""".format(
-            self.num_models
+            self.num_models + len(self.first_table_col.columns) - 1
         )
         for i in range(len(sig_levels) - 1):
             notes_text += (
