@@ -251,6 +251,22 @@ class Stargazer:
             sum([int(type(l) != float) for l in levels]) == 0
         ), "Please input floating point values as significance levels"
         self.sig_levels = sorted(levels, reverse=True)
+        # Redefine the significance stars
+        sig_bins = [-1] + sorted(self.sig_levels) + [2]
+        for md in self.model_data:
+            md["sig_icons"] = pd.cut(
+                md["p_values"],
+                bins=sig_bins,
+                labels=[
+                    "*" * (len(self.sig_levels) - i)
+                    for i in range(len(self.sig_levels) + 1)
+                ],
+            )
+            md["sig_icon_fstat"] = (
+                "*"
+                * (1 - isnan(md["f_p_value"]))
+                * (len(self.sig_levels) - digitize(md["f_p_value"], sig_bins) + 1)
+            )
 
     def significant_digits(self, digits):
         assert type(digits) == int, "The number of significant digits must be an int"
