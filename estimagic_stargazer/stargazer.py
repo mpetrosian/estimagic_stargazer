@@ -409,7 +409,7 @@ class Stargazer:
         else:
             param_print_name = param_name
         if self.param_nicer_names is not None:
-            param_print_name = self.param_nicer_names.get(param_print_name, param_name)
+            param_print_name = self.param_nicer_names.get(param_print_name,param_print_name)
         param_text = "<tr>"
         if not isinstance(param_name, tuple):
             param_text += (
@@ -667,13 +667,12 @@ class Stargazer:
         notes_text = ""
         if len(self.custom_notes) == 0:
             return notes_text
-        i = 0
         for i, note in enumerate(self.custom_notes):
-            if (i != 0) | (self.notes_append):
+            if (i != 0) or (self.notes_append):
                 notes_text += "<tr>"
             notes_text += (
                 '<td></td><td colspan="'
-                + str(self.num_models)
+                + str(self.num_models+len(self.first_table_col.columns)-1)
                 + '" style="text-align: right">'
                 + note
                 + "</td></tr>"
@@ -691,6 +690,7 @@ class Stargazer:
         return latex
 
     def generate_header_latex(self, only_tabular=False):
+        ncol = len(self.first_table_col.columns)
         header = ""
         if not only_tabular:
             header += "\\begin{table}[!htbp] \\centering\n"
@@ -702,38 +702,44 @@ class Stargazer:
 
             header += "  \\label{}\n"
 
-        header += "\\begin{tabularx}{\\textwidth}{l" + self.num_models * "X" + "}\n"
+        header += (
+            "\\begin{tabularx}{\\textwidth}{"
+            + ncol * "l"
+            + self.num_models * "X"
+            + "}\n"
+        )
         header += "\\\\[-1.8ex]\\hline\n"
         header += "\\hline \\\\[-1.8ex]\n"
         if self.model_name is not None:
-            header += "& \\multicolumn{" + str(self.num_models) + "}{c}"
+            header += "&"*ncol+"\\multicolumn{" + str(self.num_models) + "}{c}"
             header += "{\\textit{" + self.model_name + "}} \\\n"
             header += (
                 "\\cr \\cline{"
-                + str(self.num_models)
+                + str(self.num_models+1)
                 + "-"
-                + str(self.num_models + 1)
+                + str(self.num_models + ncol)
                 + "}\n"
             )
 
         if self.column_labels is not None:
             if type(self.column_labels) == str:
                 header += (
-                    "\\\\[-1.8ex] & \\multicolumn{"
+                    "\\\\[-1.8ex]"+"&"*ncol+"\\multicolumn{"
                     + str(self.num_models)
                     + "}{c}{"
                     + self.column_labels
                     + "} \\\\"
                 )
             else:
-                header += "\\\\[-1.8ex] "
+                header += (
+                    "\\\\[-1.8ex]"+(ncol-1)*"&")
                 for i, label in enumerate(self.column_labels):
                     header += "& \\multicolumn{" + str(self.column_separators[i])
                     header += "}{c}{" + label + "} "
                 header += " \\\\\n"
 
         if self.show_model_nums:
-            header += "\\\\[-1.8ex] "
+            header += "\\\\[-1.8ex]" +(ncol-1)*" &"
             for num in range(1, self.num_models + 1):
                 header += "& (" + str(num) + ") "
             header += "\\\\\n"
@@ -768,15 +774,22 @@ class Stargazer:
         return param_text
 
     def generate_param_main_latex(self, param_name):
-        param_print_name = param_name
-
+        if isinstance(param_name, tuple):
+            param_print_name = param_name[-1]
+        else:
+            param_print_name = param_name
         if self.param_nicer_names is not None:
-            if param_name in self.param_nicer_names:
-                param_print_name = self.param_nicer_names[param_name]
+            param_print_name = self.param_nicer_names.get(param_print_name,param_print_name)
 
-        param_text = " " + param_print_name + " "
+        if not isinstance(param_name,tuple):
+            param_text = " " + param_print_name + " "
+        else:
+            param_text = " "
+            for i in range(len(param_name)-1):
+                param_text += str(self.first_table_col.loc[param_name][i])+'&'
+            param_text += param_print_name
         for md in self.model_data:
-            if param_name in md["param_names"]:
+            if param_name in list(md["param_names"]):
                 param_text += "& " + str(
                     round(md["param_values"][param_name], self.sig_digits)
                 )
@@ -790,11 +803,10 @@ class Stargazer:
         return param_text
 
     def generate_param_precision_latex(self, param_name):
-        param_text = "  "
-
+        param_text = "&"*(len(self.first_table_col.columns)-1)
         for md in self.model_data:
-            if param_name in md["param_names"]:
-                param_text += "& ("
+            if param_name in list(md["param_names"]):
+                param_text +=  "&("
                 if self.confidence_intervals:
                     param_text += (
                         str(round(md["ci_lower"][param_name], self.sig_digits)) + " , "
@@ -806,7 +818,7 @@ class Stargazer:
                     param_text += str(
                         round(md["param_std_err"][param_name], self.sig_digits)
                     )
-                param_text += ") "
+                param_text += ")"
             else:
                 param_text += "& "
         param_text += "\\\\\n"
@@ -843,7 +855,7 @@ class Stargazer:
         obs_text = ""
         if not self.show_n:
             return obs_text
-        obs_text += " Observations "
+        obs_text += " Observations\\quad "+'&'*(len(self.first_table_col.columns)-1)
         for md in self.model_data:
             if isnan(md["n_obs"]):
                 obs_text += "&   "
@@ -856,7 +868,7 @@ class Stargazer:
         r2_text = ""
         if not self.show_r2:
             return r2_text
-        r2_text += " R${2}$ "
+        r2_text += " R${2}$\\quad "+'&'*(len(self.first_table_col.columns)-1)
         for md in self.model_data:
             if isnan(md["r2"]):
                 r2_text += "&   "
@@ -869,7 +881,7 @@ class Stargazer:
         r2_text = ""
         if not self.show_r2:
             return r2_text
-        r2_text += " Adjusted R${2}$ "
+        r2_text += " Adjusted R${2}$\\quad "+'&'*(len(self.first_table_col.columns)-1)
         for md in self.model_data:
             if isnan(md["r2_adj"]):
                 r2_text += "&   "
@@ -882,7 +894,7 @@ class Stargazer:
         rse_text = ""
         if not self.show_r2:
             return rse_text
-        rse_text += " Residual Std. Error "
+        rse_text += " Residual Std. Error \\quad"+'&'*(len(self.first_table_col.columns)-1)
         for md in self.model_data:
             if isnan(md["resid_std_err"]):
                 rse_text += "&  "
@@ -899,7 +911,7 @@ class Stargazer:
         if not self.show_r2:
             return f_text
 
-        f_text += " F Statistic "
+        f_text += " F Statistic\\quad "+'&'*(len(self.first_table_col.columns)-1)
 
         for md in self.model_data:
             if isnan(md["f_statistic"]):
@@ -927,7 +939,7 @@ class Stargazer:
         if not self.show_notes:
             return notes_text
 
-        notes_text += "\\textit{" + self.notes_label + "}"
+        notes_text += "\\textit{" + self.notes_label + "}&"
 
         if self.notes_append:
             notes_text += self.generate_p_value_section_latex()
@@ -938,7 +950,7 @@ class Stargazer:
     def generate_p_value_section_latex(self):
         sig_levels = sorted(self.sig_levels)
         notes_text = ""
-        notes_text += " & \\multicolumn{" + str(self.num_models) + "}{r}{"
+        notes_text += "  \\multicolumn{" + str(self.num_models+len(self.first_table_col.columns)-1) + "}{r}{"
         for i in range(len(sig_levels) - 1):
             notes_text += (
                 "$^{"
@@ -960,7 +972,7 @@ class Stargazer:
             # else:
             #     notes_text += ' & \\multicolumn{' + str(self.num_models) + '}{r}\\textit{' + note + '} \\\\\n'
             notes_text += (
-                " & \\multicolumn{"
+                " &"*len(self.first_table_col.columns)+"\\multicolumn{"
                 + str(self.num_models)
                 + "}{r}\\textit{"
                 + note
