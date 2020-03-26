@@ -939,7 +939,7 @@ class Stargazer:
         if not self.show_notes:
             return notes_text
 
-        notes_text += "\\textit{" + self.notes_label + "}&"
+        notes_text += "\\textit{" + self.notes_label + "}"
 
         if self.notes_append:
             notes_text += self.generate_p_value_section_latex()
@@ -950,7 +950,7 @@ class Stargazer:
     def generate_p_value_section_latex(self):
         sig_levels = sorted(self.sig_levels)
         notes_text = ""
-        notes_text += "  \\multicolumn{" + str(self.num_models+len(self.first_table_col.columns)-1) + "}{r}{"
+        notes_text += " & \\multicolumn{" + str(self.num_models+len(self.first_table_col.columns)-1) + "}{r}{"
         for i in range(len(sig_levels) - 1):
             notes_text += (
                 "$^{"
@@ -972,7 +972,7 @@ class Stargazer:
             # else:
             #     notes_text += ' & \\multicolumn{' + str(self.num_models) + '}{r}\\textit{' + note + '} \\\\\n'
             notes_text += (
-                " &"*len(self.first_table_col.columns)+"\\multicolumn{"
+                " &"*(len(self.first_table_col.columns))+"\\multicolumn{"
                 + str(self.num_models)
                 + "}{r}\\textit{"
                 + note
