@@ -104,7 +104,7 @@ class Stargazer:
         """
         self.title_text = None
         self.show_header = True
-        self.model_name = ""
+        self.model_name = None
         self.column_labels = None
         self.column_separators = None
         self.show_model_nums = True
@@ -409,7 +409,9 @@ class Stargazer:
         else:
             param_print_name = param_name
         if self.param_nicer_names is not None:
-            param_print_name = self.param_nicer_names.get(param_print_name,param_print_name)
+            param_print_name = self.param_nicer_names.get(
+                param_print_name, param_print_name
+            )
         param_text = "<tr>"
         if not isinstance(param_name, tuple):
             param_text += (
@@ -672,7 +674,7 @@ class Stargazer:
                 notes_text += "<tr>"
             notes_text += (
                 '<td></td><td colspan="'
-                + str(self.num_models+len(self.first_table_col.columns)-1)
+                + str(self.num_models + len(self.first_table_col.columns) - 1)
                 + '" style="text-align: right">'
                 + note
                 + "</td></tr>"
@@ -711,11 +713,11 @@ class Stargazer:
         header += "\\\\[-1.8ex]\\hline\n"
         header += "\\hline \\\\[-1.8ex]\n"
         if self.model_name is not None:
-            header += "&"*ncol+"\\multicolumn{" + str(self.num_models) + "}{c}"
+            header += "&" * ncol + "\\multicolumn{" + str(self.num_models) + "}{c}"
             header += "{\\textit{" + self.model_name + "}} \\\n"
             header += (
                 "\\cr \\cline{"
-                + str(self.num_models+1)
+                + str(self.num_models + 1)
                 + "-"
                 + str(self.num_models + ncol)
                 + "}\n"
@@ -724,22 +726,23 @@ class Stargazer:
         if self.column_labels is not None:
             if type(self.column_labels) == str:
                 header += (
-                    "\\\\[-1.8ex]"+"&"*ncol+"\\multicolumn{"
+                    "\\\\[-1.8ex]"
+                    + "&" * ncol
+                    + "\\multicolumn{"
                     + str(self.num_models)
                     + "}{c}{"
                     + self.column_labels
                     + "} \\\\"
                 )
             else:
-                header += (
-                    "\\\\[-1.8ex]"+(ncol-1)*"&")
+                header += "\\\\[-1.8ex]" + (ncol - 1) * "&"
                 for i, label in enumerate(self.column_labels):
                     header += "& \\multicolumn{" + str(self.column_separators[i])
                     header += "}{l}{" + label + "} "
                 header += " \\\\\n"
 
         if self.show_model_nums:
-            header += "\\\\[-1.8ex]" +(ncol-1)*" &"
+            header += "\\\\[-1.8ex]" + (ncol - 1) * " &"
             for num in range(1, self.num_models + 1):
                 header += "& (" + str(num) + ") "
             header += "\\\\\n"
@@ -779,14 +782,16 @@ class Stargazer:
         else:
             param_print_name = param_name
         if self.param_nicer_names is not None:
-            param_print_name = self.param_nicer_names.get(param_print_name,param_print_name)
+            param_print_name = self.param_nicer_names.get(
+                param_print_name, param_print_name
+            )
 
-        if not isinstance(param_name,tuple):
+        if not isinstance(param_name, tuple):
             param_text = " " + param_print_name + " "
         else:
             param_text = " "
-            for i in range(len(param_name)-1):
-                param_text += str(self.first_table_col.loc[param_name][i])+'&'
+            for i in range(len(param_name) - 1):
+                param_text += str(self.first_table_col.loc[param_name][i]) + "&"
             param_text += param_print_name
         for md in self.model_data:
             if param_name in list(md["param_names"]):
@@ -803,10 +808,10 @@ class Stargazer:
         return param_text
 
     def generate_param_precision_latex(self, param_name):
-        param_text = "&"*(len(self.first_table_col.columns)-1)
+        param_text = "&" * (len(self.first_table_col.columns) - 1)
         for md in self.model_data:
             if param_name in list(md["param_names"]):
-                param_text +=  "&("
+                param_text += "&("
                 if self.confidence_intervals:
                     param_text += (
                         str(round(md["ci_lower"][param_name], self.sig_digits)) + " , "
@@ -855,7 +860,9 @@ class Stargazer:
         obs_text = ""
         if not self.show_n:
             return obs_text
-        obs_text += " Observations\\quad\\quad "+'&'*(len(self.first_table_col.columns)-1)
+        obs_text += " Observations\\quad\\quad " + "&" * (
+            len(self.first_table_col.columns) - 1
+        )
         for md in self.model_data:
             if isnan(md["n_obs"]):
                 obs_text += "&   "
@@ -868,7 +875,9 @@ class Stargazer:
         r2_text = ""
         if not self.show_r2:
             return r2_text
-        r2_text += " R${2}$\\quad\\quad "+'&'*(len(self.first_table_col.columns)-1)
+        r2_text += " R${2}$\\quad\\quad " + "&" * (
+            len(self.first_table_col.columns) - 1
+        )
         for md in self.model_data:
             if isnan(md["r2"]):
                 r2_text += "&   "
@@ -881,7 +890,9 @@ class Stargazer:
         r2_text = ""
         if not self.show_r2:
             return r2_text
-        r2_text += " Adjusted R${2}$\\quad\\quad"+'&'*(len(self.first_table_col.columns)-1)
+        r2_text += " Adjusted R${2}$\\quad\\quad" + "&" * (
+            len(self.first_table_col.columns) - 1
+        )
         for md in self.model_data:
             if isnan(md["r2_adj"]):
                 r2_text += "&   "
@@ -894,7 +905,9 @@ class Stargazer:
         rse_text = ""
         if not self.show_r2:
             return rse_text
-        rse_text += " Residual Std. Error \\quad\\quad"+'&'*(len(self.first_table_col.columns)-1)
+        rse_text += " Residual Std. Error \\quad\\quad" + "&" * (
+            len(self.first_table_col.columns) - 1
+        )
         for md in self.model_data:
             if isnan(md["resid_std_err"]):
                 rse_text += "&  "
@@ -911,7 +924,9 @@ class Stargazer:
         if not self.show_r2:
             return f_text
 
-        f_text += " F Statistic\\quad\\quad "+'&'*(len(self.first_table_col.columns)-1)
+        f_text += " F Statistic\\quad\\quad " + "&" * (
+            len(self.first_table_col.columns) - 1
+        )
 
         for md in self.model_data:
             if isnan(md["f_statistic"]):
@@ -950,7 +965,11 @@ class Stargazer:
     def generate_p_value_section_latex(self):
         sig_levels = sorted(self.sig_levels)
         notes_text = ""
-        notes_text += " & \\multicolumn{" + str(self.num_models+len(self.first_table_col.columns)-1) + "}{r}{"
+        notes_text += (
+            " & \\multicolumn{"
+            + str(self.num_models + len(self.first_table_col.columns) - 1)
+            + "}{r}{"
+        )
         for i in range(len(sig_levels) - 1):
             notes_text += (
                 "$^{"
@@ -972,7 +991,8 @@ class Stargazer:
             # else:
             #     notes_text += ' & \\multicolumn{' + str(self.num_models) + '}{r}\\textit{' + note + '} \\\\\n'
             notes_text += (
-                " &"*(len(self.first_table_col.columns))+"\\multicolumn{"
+                " &" * (len(self.first_table_col.columns))
+                + "\\multicolumn{"
                 + str(self.num_models)
                 + "}{r}\\textit{"
                 + note
