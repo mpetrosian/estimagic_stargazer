@@ -735,7 +735,7 @@ class Stargazer:
                     "\\\\[-1.8ex]"+(ncol-1)*"&")
                 for i, label in enumerate(self.column_labels):
                     header += "& \\multicolumn{" + str(self.column_separators[i])
-                    header += "}{c}{" + label + "} "
+                    header += "}{l}{" + label + "} "
                 header += " \\\\\n"
 
         if self.show_model_nums:
@@ -855,7 +855,7 @@ class Stargazer:
         obs_text = ""
         if not self.show_n:
             return obs_text
-        obs_text += " Observations\\quad "+'&'*(len(self.first_table_col.columns)-1)
+        obs_text += " Observations\\quad\\quad "+'&'*(len(self.first_table_col.columns)-1)
         for md in self.model_data:
             if isnan(md["n_obs"]):
                 obs_text += "&   "
@@ -868,7 +868,7 @@ class Stargazer:
         r2_text = ""
         if not self.show_r2:
             return r2_text
-        r2_text += " R${2}$\\quad "+'&'*(len(self.first_table_col.columns)-1)
+        r2_text += " R${2}$\\quad\\quad "+'&'*(len(self.first_table_col.columns)-1)
         for md in self.model_data:
             if isnan(md["r2"]):
                 r2_text += "&   "
@@ -881,7 +881,7 @@ class Stargazer:
         r2_text = ""
         if not self.show_r2:
             return r2_text
-        r2_text += " Adjusted R${2}$\\quad "+'&'*(len(self.first_table_col.columns)-1)
+        r2_text += " Adjusted R${2}$\\quad\\quad"+'&'*(len(self.first_table_col.columns)-1)
         for md in self.model_data:
             if isnan(md["r2_adj"]):
                 r2_text += "&   "
@@ -894,7 +894,7 @@ class Stargazer:
         rse_text = ""
         if not self.show_r2:
             return rse_text
-        rse_text += " Residual Std. Error \\quad"+'&'*(len(self.first_table_col.columns)-1)
+        rse_text += " Residual Std. Error \\quad\\quad"+'&'*(len(self.first_table_col.columns)-1)
         for md in self.model_data:
             if isnan(md["resid_std_err"]):
                 rse_text += "&  "
@@ -911,7 +911,7 @@ class Stargazer:
         if not self.show_r2:
             return f_text
 
-        f_text += " F Statistic\\quad "+'&'*(len(self.first_table_col.columns)-1)
+        f_text += " F Statistic\\quad\\quad "+'&'*(len(self.first_table_col.columns)-1)
 
         for md in self.model_data:
             if isnan(md["f_statistic"]):
